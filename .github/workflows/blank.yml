@@ -90,7 +90,9 @@ jobs:
           echo "📄 Existing PR body:"
           echo "$EXISTING_BODY"
 
-          NEW_BODY="${EXISTING_BODY}\n\n${CHECKLIST}"
+          NEW_BODY="${EXISTING_BODY}
+
+          ${CHECKLIST}"
           NEW_BODY_ESCAPED=$(jq -n --arg body "$NEW_BODY" '{body: $body}')
           curl -s -X PATCH -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Content-Type: application/json" \
