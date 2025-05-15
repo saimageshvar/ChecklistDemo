@@ -1,4 +1,4 @@
-<!-- pr-checklist.md -->
+<!-- PR_CHECKLIST_MARKER -->
 ### ✅ PR Checklist
 
 - [ ] Code builds successfully
