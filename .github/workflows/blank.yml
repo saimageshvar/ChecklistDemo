@@ -62,7 +62,7 @@ jobs:
           RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             https://api.github.com/repos/$REPO/pulls/$PR_NUMBER)
 
-          BODY=$(echo "$RESPONSE" | jq -r '.body')
+          BODY=$(echo "$RESPONSE" | jq -r '.body // ""')
 
           echo "Current PR body:"
           echo "$BODY"
