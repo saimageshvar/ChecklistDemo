@@ -91,10 +91,10 @@ jobs:
           echo "$EXISTING_BODY"
 
           NEW_BODY="${EXISTING_BODY}\n\n${CHECKLIST}"
-
+          NEW_BODY_ESCAPED=$(jq -n --arg body "$NEW_BODY" '{body: $body}')
           curl -s -X PATCH -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Content-Type: application/json" \
-            -d "$(jq -nc --arg body "$NEW_BODY" '{body: $body}')" \
+            -d "$NEW_BODY_ESCAPED" \
             https://api.github.com/repos/$REPO/pulls/$PR_NUMBER
 
           echo "✅ PR body updated successfully."
