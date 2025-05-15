@@ -20,9 +20,9 @@ jobs:
       - name: Read checklist from file
         id: read_checklist
         run: |
-          echo "🔍 Reading checklist from .github/pr-checklist.md..."
+          echo "🔍 Reading checklist from .github/release-checklist.md..."
           echo "checklist<<EOF" >> $GITHUB_OUTPUT
-          cat .github/pr-checklist.md >> $GITHUB_OUTPUT
+          cat .github/release-checklist.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
           echo "✅ Checklist file successfully read."
 
