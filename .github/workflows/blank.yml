@@ -104,7 +104,7 @@ jobs:
           ${CHECKLIST}"
 
           NEW_BODY_ESCAPED=$(jq -n --arg body "$NEW_BODY" '{body: $body}')
-          curl -s -X PATCH -H "Authorization: token $GITHUB_TOKEN"" \
+          curl -s -X PATCH -H "Authorization: token $GITHUB_TOKEN" \
             -H "Content-Type: application/json" \
             -d "$NEW_BODY_ESCAPED" \
             https://api.github.com/repos/$REPO/pulls/$PR_NUMBER
