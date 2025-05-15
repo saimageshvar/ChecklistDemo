@@ -32,3 +32,42 @@ jobs:
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
+  append_checklist:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Read checklist from file
+        id: read_checklist
+        run: |
+          echo "🔍 Reading checklist from pr-checklist.md..."
+          cat pr-checklist.md
+          echo "checklist<<EOF" >> $GITHUB_OUTPUT
+          cat pr-checklist.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "✅ Checklist file successfully read."
+
+      - name: Get current PR body
+        id: get_pr_body
+        run: |
+          echo "🔍 Fetching existing PR body..."
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          REPO=${{ github.repository }}
+          echo "ℹ️ Repo: $REPO"
+          echo "ℹ️ PR Number: $PR_NUMBER"
+
+          RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/$REPO/pulls/$PR_NUMBER)
+
+          BODY=$(echo "$RESPONSE" | jq -r '.body')
+
+          echo "Current PR body:"
+          echo "$BODY"
+
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "✅ PR body fetched and stored."
