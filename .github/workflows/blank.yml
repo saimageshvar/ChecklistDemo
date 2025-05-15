@@ -71,3 +71,30 @@ jobs:
           echo "$BODY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
           echo "✅ PR body fetched and stored."
+
+      - name: Append checklist to PR body
+        run: |
+          echo "🛠 Appending checklist to PR body..."
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          REPO=${{ github.repository }}
+
+          echo "ℹ️ Repo: $REPO"
+          echo "ℹ️ PR Number: $PR_NUMBER"
+
+          CHECKLIST="${{ steps.read_checklist.outputs.checklist }}"
+          EXISTING_BODY="${{ steps.get_pr_body.outputs.body }}"
+
+          echo "📋 Checklist to append:"
+          echo "$CHECKLIST"
+
+          echo "📄 Existing PR body:"
+          echo "$EXISTING_BODY"
+
+          NEW_BODY="${EXISTING_BODY}\n\n${CHECKLIST}"
+
+          curl -s -X PATCH -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -nc --arg body "$NEW_BODY" '{body: $body}')" \
+            https://api.github.com/repos/$REPO/pulls/$PR_NUMBER
+
+          echo "✅ PR body updated successfully."
