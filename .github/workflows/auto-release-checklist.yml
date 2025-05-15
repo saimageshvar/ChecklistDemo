@@ -1,38 +1,14 @@
-# This is a basic workflow to help you get started with Actions
+name: Auto Release Checklist
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
     types: [opened, reopened]
 
 permissions:
   pull-requests: write
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
   append_checklist:
     runs-on: ubuntu-latest
     steps:
@@ -44,10 +20,9 @@ jobs:
       - name: Read checklist from file
         id: read_checklist
         run: |
-          echo "🔍 Reading checklist from pr-checklist.md..."
-          cat pr-checklist.md
+          echo "🔍 Reading checklist from .github/pr-checklist.md..."
           echo "checklist<<EOF" >> $GITHUB_OUTPUT
-          cat pr-checklist.md >> $GITHUB_OUTPUT
+          cat .github/pr-checklist.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
           echo "✅ Checklist file successfully read."
 
@@ -80,8 +55,6 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           echo "🛠 Appending checklist to PR body..."
-          # PR_NUMBER=${{ github.event.pull_request.number }}
-          # REPO=${{ github.repository }}
 
           echo "ℹ️ Repo: $REPO"
           echo "ℹ️ PR Number: $PR_NUMBER"
