@@ -48,7 +48,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           echo "📝 Reading checklist from .github/release-checklist.md..."
-          CHECKLIST=$(cat .github/pr-checklist.md)
+          CHECKLIST=$(cat .github/release-checklist.md)
           echo "✅ Checklist file successfully read."
           echo "📝 Appending checklist to PR body..."
           echo "ℹ️ Repo: $REPO"
