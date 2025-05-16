@@ -21,15 +21,6 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Read checklist from file
-        id: read_checklist
-        run: |
-          echo "📝 Reading checklist from .github/release-checklist.md..."
-          echo "checklist<<EOF" >> $GITHUB_OUTPUT
-          cat .github/release-checklist.md >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-          echo "✅ Checklist file successfully read."
-
       - name: Get current PR body
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -56,10 +47,12 @@ jobs:
           REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
+          echo "📝 Reading checklist from .github/release-checklist.md..."
+          CHECKLIST=$(cat .github/pr-checklist.md)
+          echo "✅ Checklist file successfully read."
           echo "📝 Appending checklist to PR body..."
           echo "ℹ️ Repo: $REPO"
           echo "ℹ️ PR Number: $PR_NUMBER"
-          CHECKLIST="${{ steps.read_checklist.outputs.checklist }}"
           EXISTING_BODY="${{ steps.get_pr_body.outputs.body }}"
           if echo "$EXISTING_BODY" | grep -qF -- "<!-- PR_CHECKLIST_MARKER -->"; then
             echo "✅ Checklist already present. Skipping update."
