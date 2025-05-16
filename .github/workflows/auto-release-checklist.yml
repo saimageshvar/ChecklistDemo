@@ -20,29 +20,27 @@ jobs:
       - name: Read checklist from file
         id: read_checklist
         run: |
-          echo "🔍 Reading checklist from .github/release-checklist.md..."
+          echo "📝 Reading checklist from .github/release-checklist.md..."
           echo "checklist<<EOF" >> $GITHUB_OUTPUT
           cat .github/release-checklist.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
           echo "✅ Checklist file successfully read."
 
       - name: Get current PR body
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         id: get_pr_body
         run: |
-          echo "🔍 Fetching existing PR body..."
-          PR_NUMBER=${{ github.event.pull_request.number }}
-          REPO=${{ github.repository }}
+          echo "📝 Fetching existing PR body..."
           echo "ℹ️ Repo: $REPO"
           echo "ℹ️ PR Number: $PR_NUMBER"
-
-          RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
             https://api.github.com/repos/$REPO/pulls/$PR_NUMBER)
-
           BODY=$(echo "$RESPONSE" | jq -r '.body // ""')
-
-          echo "Current PR body:"
+          echo "ℹ️ Current PR body:"
           echo "$BODY"
-
           echo "body<<EOF" >> $GITHUB_OUTPUT
           echo "$BODY" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -54,33 +52,25 @@ jobs:
           REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          echo "🛠 Appending checklist to PR body..."
-
+          echo "📝 Appending checklist to PR body..."
           echo "ℹ️ Repo: $REPO"
           echo "ℹ️ PR Number: $PR_NUMBER"
-
           CHECKLIST="${{ steps.read_checklist.outputs.checklist }}"
           EXISTING_BODY="${{ steps.get_pr_body.outputs.body }}"
-
           if echo "$EXISTING_BODY" | grep -qF -- "<!-- PR_CHECKLIST_MARKER -->"; then
             echo "✅ Checklist already present. Skipping update."
             exit 0
           fi
-
-          echo "📋 Checklist to append:"
+          echo "ℹ️ Checklist to append:"
           echo "$CHECKLIST"
-
-          echo "📄 Existing PR body:"
+          echo "ℹ️ Existing PR body:"
           echo "$EXISTING_BODY"
-
           NEW_BODY="${EXISTING_BODY}
 
           ${CHECKLIST}"
-
           NEW_BODY_ESCAPED=$(jq -n --arg body "$NEW_BODY" '{body: $body}')
           curl -s -X PATCH -H "Authorization: token $GITHUB_TOKEN" \
             -H "Content-Type: application/json" \
             -d "$NEW_BODY_ESCAPED" \
             https://api.github.com/repos/$REPO/pulls/$PR_NUMBER
-
           echo "✅ PR body updated successfully."
